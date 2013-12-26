@@ -50,11 +50,18 @@ public class ChanPlugin extends BasePlugin {
     @Override
     public void userDidEnter(String userName) {
         Player pb = gamePlayer.getPlayerData(userName);
+        EsObject es = new EsObject();
         gamePlayer.addPlayer(pb);
         if (gamePlayer.getNumPlayerInRoom() == 1) {
             pb.setMasterRoom(true);
+            es.setString(Field.Command.getName(), Command.JoinRoom.getCommand());
+            es.setString(Field.Message.getName(), userName + " đã tạo phòng");
+            MessagingHelper.sendMessageToRoom(es, getApi());
             getApi().getLogger().warn(userName + " created room");
         } else {
+            es.setString(Field.Command.getName(), Command.JoinRoom.getCommand());
+            es.setString(Field.Message.getName(), userName + " đã vào phòng");
+            MessagingHelper.sendMessageToRoom(es, getApi());
             getApi().getLogger().warn(userName + " join to room");
         }
     }
@@ -84,6 +91,10 @@ public class ChanPlugin extends BasePlugin {
         gamePlayer.removePlayer(userName);
         if (gamePlayer.getNumPlayerInRoom() > 0) {
             gamePlayer.setMasterRoom();
+            EsObject es = new EsObject();
+            es.setString(Field.Command.getName(), Command.LeaveRoom.getCommand());
+            es.setString(Field.Message.getName(), userName + " đã rời khỏi phòng");
+            MessagingHelper.sendMessageToRoom(es, getApi());
             getApi().getLogger().debug(userName + " leave the room.Master room set for " + gamePlayer.getMasterRoom().getUsername());
         } else {
             destroy();

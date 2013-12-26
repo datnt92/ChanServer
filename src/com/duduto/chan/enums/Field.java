@@ -1,12 +1,14 @@
 package com.duduto.chan.enums;
 
 public enum Field {
+    JoinRoom("joinRoom"),
     PlayerEmpty("playerEmpty"),
     KickPlayer("kickPlayer"),
     PlayerKick("playerKick"),
     AlertMessage("alertMessage"),
     Message("message"),
     MasterRoom("masterRoom"),
+    FakeMoney("fakeMoney"),
     Money("money"),
     UserName("userName"),
     UserData("userData"),

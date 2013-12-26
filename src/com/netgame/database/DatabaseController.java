@@ -57,6 +57,7 @@ public class DatabaseController {
     }
 
     //</editor-fold>
+    
     public PlayerBean loginDB(String username, String pass) {
         Handle handle = getDbi().open();
         try {
@@ -112,6 +113,8 @@ public class DatabaseController {
                 
                 PlayerBean player = new PlayerBean();
                 player.setUsername(username);
+                player.setMoney(Integer.parseInt(map.get("money").toString()));
+                player.setFakeMoney(Integer.parseInt(map.get("fake_money").toString()));
                 player.setPassword(map.get("password").toString());
                 player.setStatus(Integer.valueOf(map.get("status").toString()));
                 player.setTimeRegister(map.get("time_insert").toString());
@@ -127,7 +130,7 @@ public class DatabaseController {
         }
     }
     
-    private void writeNewPlayer(String username, String password, String email, int status) {
+    public void writeNewPlayer(String username, String password, String email, int status) {
         Handle handle = getDbi().open();
         try {
             handle.createStatement("sql/WriteNewPlayer.sql")
@@ -142,6 +145,21 @@ public class DatabaseController {
         }
         
     }
+    
+   public void writeLogMoney(String username,int old_money,int money,String description){
+       Handle handle = getDbi().open();
+       try {
+          handle.createStatement("sql/WriteLogMoney.sql")
+                  .bind("username", username)
+                  .bind("old_money", old_money)
+                  .bind("money", money)
+                  .bind("description", description).execute();
+       } catch (Exception e) {
+            logger.error("error write log money " + e.getMessage());
+       }finally{
+           closeHandle(handle);
+       }
+   }
 
     //<editor-fold defaultstate="collapsed" desc="don't remove">
     public void writeLogServerStart() {

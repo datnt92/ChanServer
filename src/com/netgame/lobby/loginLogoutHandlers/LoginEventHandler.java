@@ -29,13 +29,13 @@ public class LoginEventHandler extends BaseLoginEventHandler {
         // EsObjectRO esLogin = context.getRequestParameters();
         String username = context.getUserName().trim();
         getApi().getLogger().debug("u =" + username);
-        String strPassword = context.getPassword().trim();
-        String password = "";
+//        String strPassword = context.getPassword().trim();
+//        String password = "";
         int login_state = -999;
         try {
-            password = EnUtil.getMD5String(strPassword);
-            PlayerBean playerBean = dbController.loginDB(username, password);
-
+//            password = EnUtil.getMD5String(strPassword);
+//            PlayerBean playerBean = dbController.loginDB(username, password);
+            PlayerBean playerBean = dbController.getPlayerData(username);
             //login faild
             if (playerBean == null) {
                 EsObject es = MessagingHelper.buildErrorMessage(username, ErrorCode.LoginFaild, Message.LoginFaild.getMessage());

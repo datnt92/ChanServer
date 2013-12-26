@@ -11,19 +11,20 @@ import com.duduto.chan.enums.Field;
  *
  * @author Blacker
  */
-public  class PlayerBean {
+public class PlayerBean {
+
     private int pId;
-    private  String username;
+    private String username;
     private String password;
     private String email;
     private String timeRegister;
+    private int fakeMoney;
+    private int money;
     private int status;
 
-   
     public PlayerBean() {
     }
 
-    
     public int getpId() {
         return pId;
     }
@@ -72,11 +73,28 @@ public  class PlayerBean {
         this.status = status;
     }
 
-    
-    public EsObject toEsObject(){
+    public int getFakeMoney() {
+        return fakeMoney;
+    }
+
+    public void setFakeMoney(int fakeMoney) {
+        this.fakeMoney = fakeMoney;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public EsObject toEsObject() {
         EsObject es = new EsObject();
         es.setString(Field.UserName.getName(), username);
         es.setString(Field.Email.getName(), email);
+        es.setInteger(Field.Money.getName(), money);
+        es.setInteger(Field.FakeMoney.getName(), fakeMoney);
         return es;
     }
 }

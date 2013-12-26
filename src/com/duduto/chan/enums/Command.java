@@ -8,7 +8,11 @@ public enum Command {
     MiddlewareRequest("middlewareRequest"),
     MiddlewareUserName("MIDDLEWARE"),
     KickPlayer("kickPlayer"),
+    CreateRoom("createRoom"),
+    JoinRoom("joinRoom"),
+    LeaveRoom("leaveRoom"),
     GetBuddyList("getBuddyList");
+    
     private final String command;
 
     private Command(String command) {
