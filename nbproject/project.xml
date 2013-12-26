@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>ChanServer</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>ChanServer</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>src</label>
+                    <type>java</type>
+                    <location>src</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>ChanServer</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>test</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="test">
+                    <target>test</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>test</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src</label>
+                        <location>src</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="test"/>
+                </context-menu>
+            </view>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+            <compilation-unit>
+                <package-root>src</package-root>
+                <classpath mode="compile">lib/bcpg-jdk16-141.jar;lib/commons-codec-1.6.jar;lib/commons-dbcp-1.2.2.jar;lib/commons-logging-1.1.1.jar;lib/commons-pool-1.4.jar;lib/cron4j-2.2.5.jar;lib/DBPool_v4.8.3.jar;lib/derby.jar;lib/derbyclient.jar;lib/derbynet.jar;lib/derbyrun.jar;lib/derbytools.jar;lib/ElectroServer-5-Java-Client.jar;lib/ElectroServer5.jar;lib/EnUtil-1.0.1.jar;lib/ezmorph.jar;lib/fluent-hc-4.2.5.jar;lib/gson-2.2.3.jar;lib/httpclient-4.2.5.jar;lib/httpclient-cache-4.2.5.jar;lib/httpcore-4.2.4.jar;lib/httpmime-4.2.5.jar;lib/javax.servlet-3.0.0.v201112011016.jar;lib/jdbi-2.2.1.jar;lib/jetty-continuation-8.1.7.v20120910.jar;lib/jetty-http-8.1.7.v20120910.jar;lib/jetty-io-8.1.7.v20120910.jar;lib/jetty-security-8.1.7.v20120910.jar;lib/jetty-server-8.1.7.v20120910.jar;lib/jetty-servlet-8.1.7.v20120910.jar;lib/jetty-util-8.1.7.v20120910.jar;lib/json-org.jar;lib/json_simple-1.1.jar;lib/log4j-1.2.17.jar;lib/mysql-connector-java-5.0.4-bin.jar;lib/noggit-1.0-SNAPSHOT.jar;lib/slf4j-api-1.4.3.jar</classpath>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

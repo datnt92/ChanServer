@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Extension>
+    <Name>ChanServer</Name>
+    <ManagedObjects>
+        <ManagedObject>
+            <Handle>DatabaseControllerFactory</Handle>
+            <Type>Java</Type>
+            <Path>com.netgame.database.DatabaseControllerFactory</Path>
+                 <Variables>
+                <Variable name="database" type="String">database.properties</Variable>
+                <Variable name="gameconfig" type="String">gameconfig.properties</Variable>
+            </Variables>
+        </ManagedObject>
+    </ManagedObjects>
+    <EventHandlers>
+        <ExtensionLifecycleHandlers>
+            <ExtensionLifecycleHandler>
+                <Handle>GMSInitializer</Handle>
+                <Type>Java</Type>
+                <Path>com.netgame.gamemanager.GMSInitializer</Path>
+            </ExtensionLifecycleHandler>
+        </ExtensionLifecycleHandlers>
+        <LoginHandlers>
+            <LoginHandler>
+                <Handle>LoginEventHandler</Handle>
+                <Type>Java</Type>
+                <Path>com.netgame.lobby.loginLogoutHandlers.LoginEventHandler</Path>
+            </LoginHandler>
+        </LoginHandlers>
+        <LogoutHandlers>
+            <LogoutHandler>
+                <Handle>LogoutEventHandler</Handle>
+                <Type>Java</Type>
+                <Path>com.netgame.lobby.loginLogoutHandlers.LogoutEventHandler</Path>
+            </LogoutHandler>
+        </LogoutHandlers>
+    </EventHandlers>
+    <Plugins>
+        <Plugin>
+            <Handle>LobbyPlugin</Handle>
+            <Type>Java</Type>
+            <Path>com.netgame.lobby.LobbyPlugin</Path>
+        </Plugin>  
+         <Plugin>
+            <Handle>ChanPlugin</Handle>
+            <Type>Java</Type>
+            <Path>com.duduto.chan.plugin.ChanPlugin</Path>
+        </Plugin>            
+    </Plugins>
+</Extension>
+

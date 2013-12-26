@@ -1,0 +1,85 @@
+
+<project name="ChanServer" default="test" basedir=".">
+    <property file="build.properties" />
+    <echo message="Found in build.properties {" />
+    <echo message="    deploy.path=${deploy.path}" />
+    <echo message="}" />
+    
+    <property name="build" value="build" />
+    <property name="dist.jar" value="dist/jar" />
+    <property name="extension.name" value="${ant.project.name}" />
+    <property name="dist.ext" value="dist/ext/${extension.name}" />
+    <property name="src" value="src" />
+    <property name="lib" value="lib" />
+    <property name="config" value="config" />
+    
+    <target name="clean">
+        <delete dir="${build}"/>
+        <delete dir="${dist.jar}"/>
+        <delete dir="${dist.ext}"/>
+    </target>
+    
+    <target name="prep">
+        <!-- Create the destination directory -->
+        <mkdir dir="${dist.jar}" />
+        <mkdir dir="${dist.ext}" />
+        <mkdir dir="${build}" />
+    </target>
+    
+    <target name="compile" depends="clean, prep">
+        <javac destdir="${build}" includeantruntime="false" deprecation="on" debug="on" target="1.6" source="1.6" encoding="UTF-8">
+            <compilerarg line="-Xlint:unchecked" />
+            <src path="${src}" />
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="*.jar"/>
+                    <include name="*.zip"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+    <target name="build" depends="compile">
+        <jar jarfile="${dist.jar}/${extension.name}.jar">
+            <fileset dir="${build}" />
+        </jar>
+    </target>
+    
+    <!-- Creates an extension in the dist/ext folder for copying later -->
+    <target name="deploy" depends="build">
+        <copy 
+            file="Extension.xml" 
+            todir="${dist.ext}/" 
+            failonerror="true" />
+        <copy todir="${dist.ext}/config" failonerror="false">
+            <fileset dir="${config}" >
+                <exclude name="**/.svn"/>
+            </fileset>
+        </copy>
+        <copy todir="${dist.ext}/lib" failonerror="false">
+            <fileset dir="${lib}">
+                <exclude name="**/.svn"/>
+            </fileset>
+        </copy>
+        <delete file="${dist.ext}/lib/ElectroServer5.jar" failonerror="false" />
+        <copy todir="${dist.ext}/lib" file="${dist.jar}/${extension.name}.jar" />
+    </target>
+    
+    <!-- If deploy.path points to your ES5's server/extensions folder, this 
+    deploys the extension directly to your local ES5 for testing -->
+
+            
+    <target name="test" depends="deploy">
+        <delete dir="C:/Program Files/ElectroServer_5_4_1/server/extensions/${extension.name}"/>
+        <copy todir="C:/Program Files/ElectroServer_5_4_1/server/extensions/${extension.name}">
+            <fileset dir="${dist.ext}" />
+        </copy>
+    </target>
+    
+    
+    <!--    <target name="unit-test">
+        <delete file="E:/PROJECT/VG/TestHorseRace/lib/${extension.name}.jar"/>
+        <copy todir="E:/PROJECT/VG/TestHorseRace/lib/${extension.name}.jar">
+            <fileset dir="${dist.jar}" />
+        </copy>
+    </target>-->
+</project>
