@@ -1,6 +1,9 @@
 package com.duduto.chan.enums;
 
 public enum Field {
+    Empty("empty"),
+    slotSit("slotSit"),
+    Position("position"),
     JoinRoom("joinRoom"),
     PlayerEmpty("playerEmpty"),
     KickPlayer("kickPlayer"),
@@ -11,10 +14,12 @@ public enum Field {
     FakeMoney("fakeMoney"),
     Money("money"),
     UserName("userName"),
-    UserData("userData"),
+    PlayerData("playerData"),
     Email("email"),
     DisplayName("displayName"),
+    Sit("sit"),
     Command("command"),
+    ListPlayer("listPlayer"),
     ErrorCode("errorCode"),
     Action("action"),
     RoomName("roomName"),
@@ -27,6 +32,7 @@ public enum Field {
     Choice("choice"),
     Info("info"),
     Status("status"),
+    PlayerState("state"),
     HasPass("hasPass"),
     RoomList("roomList"),
     CommonInfo("commonInfo"),

@@ -6,6 +6,7 @@ package com.duduto.chan.model;
 
 import com.electrotank.electroserver5.extensions.api.value.EsObject;
 import com.duduto.chan.enums.Field;
+import com.duduto.chan.enums.PlayerState;
 
 /**
  *
@@ -13,9 +14,10 @@ import com.duduto.chan.enums.Field;
  */
 public class Player {
 
-    private boolean masterRoom;
+    private boolean masterRoom = false;
     private PlayerBean playerData;
-
+    private PlayerState state;
+    
     public Player(PlayerBean player) {
         this.playerData = player;
     }
@@ -48,4 +50,14 @@ public class Player {
         es.setBoolean(Field.MasterRoom.getName(), masterRoom);
         return es;
     }
+
+    public PlayerState getState() {
+        return state;
+    }
+
+    public void setState(PlayerState state) {
+        this.state = state;
+    }
+    
+    
 }

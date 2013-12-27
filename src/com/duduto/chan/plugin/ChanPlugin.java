@@ -4,7 +4,6 @@
  */
 package com.duduto.chan.plugin;
 
-import com.duduto.chan.enums.ErrorCode;
 import com.duduto.chan.model.GamePlayer;
 import com.duduto.chan.model.Player;
 import com.duduto.util.MessagingHelper;
@@ -16,6 +15,7 @@ import com.electrotank.electroserver5.extensions.api.value.UserEnterContext;
 import com.duduto.chan.enums.Command;
 import com.duduto.chan.enums.Field;
 import com.duduto.chan.enums.Message;
+import com.duduto.chan.enums.PlayerState;
 import com.electrotank.electroserver5.extensions.api.value.UserPublicMessageContext;
 import com.netgame.lobby.controllers.PublicMessageController;
 import com.netgame.lobby.model.LobbyModel;
@@ -49,66 +49,55 @@ public class ChanPlugin extends BasePlugin {
 
     @Override
     public void userDidEnter(String userName) {
-        Player pb = gamePlayer.getPlayerData(userName);
-        EsObject es = new EsObject();
-        gamePlayer.addPlayer(pb);
-        if (gamePlayer.getNumPlayerInRoom() == 1) {
-            pb.setMasterRoom(true);
-            es.setString(Field.Command.getName(), Command.JoinRoom.getCommand());
-            es.setString(Field.Message.getName(), userName + " đã tạo phòng");
-            MessagingHelper.sendMessageToRoom(es, getApi());
-            getApi().getLogger().warn(userName + " created room");
-        } else {
-            es.setString(Field.Command.getName(), Command.JoinRoom.getCommand());
-            es.setString(Field.Message.getName(), userName + " đã vào phòng");
-            MessagingHelper.sendMessageToRoom(es, getApi());
-            getApi().getLogger().warn(userName + " join to room");
+        Player p = gamePlayer.getPlayerData(userName);
+        gamePlayer.getLstPlayerInRoom().add(p);
+        if (gamePlayer.getLstPlayerInRoom().size() == 1) {
+            p.setMasterRoom(true);
         }
+        p.setState(PlayerState.View);
+        EsObject es = new EsObject();
+        es.setString(Field.Command.getName(), Command.JoinRoom.getCommand());
+        es.setString(Field.UserName.getName(), userName);
+        MessagingHelper.sendMessageToRoom(es, getApi());
+        getApi().getLogger().warn(userName + " join to room");
     }
 
     @Override
     public ChainAction userEnter(UserEnterContext context) {
-        String username = context.getUserName();
-        ErrorCode error = gamePlayer.checkJoinRoom();
-        if (error == ErrorCode.MaxPlayer) {
-            MessagingHelper.sendMessageAlertToPlayer(username, Message.MaxPlayer.getMessage(), getApi());
-            return ChainAction.Fail;
-        }
         return ChainAction.OkAndContinue;
     }
 
     @Override
     public void request(String userName, EsObjectRO requestParameters) {
         if (requestParameters.getString(Field.Command.getName()).equals(Command.GetPlayerList.getCommand())) {
-            this.rqListPlayer();
+            this.rqListPlayer(userName);
         } else if (requestParameters.getString(Field.Command.getName()).equals(Command.KickPlayer.getCommand())) {
-            kickOutRoom(userName, requestParameters);
+            rqKickPlayer(userName, requestParameters);
+        } else if (requestParameters.getString(Field.Command.getName()).equals(Command.Sit.getCommand())) {
+            this.rqSit(userName, requestParameters);
         }
     }
 
     @Override
     public void userExit(String userName) {
-        gamePlayer.removePlayer(userName);
-        if (gamePlayer.getNumPlayerInRoom() > 0) {
-            gamePlayer.setMasterRoom();
-            EsObject es = new EsObject();
-            es.setString(Field.Command.getName(), Command.LeaveRoom.getCommand());
-            es.setString(Field.Message.getName(), userName + " đã rời khỏi phòng");
+        EsObject es = gamePlayer.leaveRoom(userName, gamePlayer.getLstPlayerInRoom());
+        if (gamePlayer.getLstPlayerInRoom().size() > 0) {
             MessagingHelper.sendMessageToRoom(es, getApi());
-            getApi().getLogger().debug(userName + " leave the room.Master room set for " + gamePlayer.getMasterRoom().getUsername());
         } else {
             destroy();
             getApi().getLogger().warn("room " + getApi().getRoomId() + " destroyed");
         }
     }
 
-    private void rqListPlayer() {
-        EsObject[] EsPlayersInfo = gamePlayer.getListPlayerEsObject();
-        MessagingHelper.sendMessageListPlayer(EsPlayersInfo, getApi());
+    private void rqListPlayer(String userName) {
+        EsObject es = new EsObject();
+        es.setString(Field.Command.getName(), Command.ListPlayer.getCommand());
+        es.setEsObjectArray(Field.slotSit.getName(), gamePlayer.getSlotSit());
+        MessagingHelper.sendMessageToPlayer(userName, es, getApi());
     }
 
-    private void kickOutRoom(String username, EsObjectRO request) {
-        Player masterRoom = gamePlayer.getPlayerData(username);
+    private void rqKickPlayer(String username, EsObjectRO request) {
+        Player masterRoom = gamePlayer.getPlayer(username);
         if (!request.variableExists(Field.KickPlayer.getName()) && masterRoom != null) {
             String playerKick = request.getString(Field.PlayerKick.getName());
             if (masterRoom.isMasterRoom()) {
@@ -121,6 +110,32 @@ public class ChanPlugin extends BasePlugin {
             }
         } else {
             MessagingHelper.sendMessageAlertToPlayer(username, Message.PlayerNotFound.getMessage(), getApi());
+        }
+    }
+
+    private void rqSit(String username, EsObjectRO request) {
+        Player player = gamePlayer.getPlayerData(username);
+        EsObject es;
+        if (player.getState() != PlayerState.Sit) {
+            int position = request.getInteger(Field.Position.getName());
+            if (gamePlayer.getArrPlayers()[position] == null) {
+                gamePlayer.addPlayer(player, position);
+                player.setState(PlayerState.Sit);
+                es = gamePlayer.getEsPlayerData(player);
+                es.setInteger(Field.Position.getName(), position);
+                es.setString(Field.Command.getName(), Field.Sit.getName());
+                es.setString(Field.UserName.getName(), username);
+                MessagingHelper.sendMessageToRoom(es, getApi());
+            } else {
+                es = new EsObject();
+                es.setString(Field.Command.getName(), Field.Sit.getName());
+                es.setBoolean(Field.Empty.getName(), false);
+                MessagingHelper.sendMessageToPlayer(username, es, getApi());
+            }
+        } else {
+            es = new EsObject();
+            es.setString(Field.Command.getName(), Field.Sit.getName());
+            es.setBoolean(Field.Sit.getName(), true);
         }
     }
 

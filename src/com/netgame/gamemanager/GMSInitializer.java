@@ -24,7 +24,7 @@ public class GMSInitializer extends BaseExtensionLifecycleEventHandler {
     public void init(EsObjectRO ignored) {
         // use the name of the extension that will contain all the game plugins
         String extensionName = getApi().getExtensionName();
-//          initOneGame(extensionName, "HorseRacePlugin", "HorseRacePlugin", 10000);
+        initOneGame(extensionName, "ChanPlugin", "ChanPlugin", 10000);
 //        initOneGame(extensionName, "PhomPlugin", "PhomPlugin", 4);
 //        initOneGame(extensionName, "DemLaPlugin", "DemLaPlugin", 4);
 //        initOneGame(extensionName, "O3CPlugin", "O3CPlugin", 8);

@@ -10,7 +10,9 @@ public enum Command {
     KickPlayer("kickPlayer"),
     CreateRoom("createRoom"),
     JoinRoom("joinRoom"),
+    Sit("sit"),
     LeaveRoom("leaveRoom"),
+    ListPlayer("listPlayer"),
     GetBuddyList("getBuddyList");
     
     private final String command;
