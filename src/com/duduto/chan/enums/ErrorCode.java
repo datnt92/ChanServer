@@ -4,7 +4,10 @@ public enum ErrorCode {
 
     IsSuccess(999),
     SystemError(-1),
-    MaxPlayer(100),
+    FullSlot(100),
+    SlotNotEmpty(101),
+    NotEnoughtMoney(102),
+    PlayerSit(103),
     UserNameEmpty(200),
     UserNameExist(201),
     LoginFaild(202),

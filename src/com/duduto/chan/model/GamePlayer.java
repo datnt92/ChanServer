@@ -9,6 +9,7 @@ import com.duduto.chan.enums.Command;
 import com.duduto.chan.enums.ErrorCode;
 import com.duduto.chan.enums.Field;
 import com.duduto.chan.enums.GameState;
+import com.duduto.chan.enums.PlayerState;
 import com.electrotank.electroserver5.extensions.api.PluginApi;
 import com.electrotank.electroserver5.extensions.api.value.EsObject;
 import com.electrotank.electroserver5.extensions.api.value.EsObjectRO;
@@ -28,6 +29,7 @@ public class GamePlayer {
     private DatabaseController _dbController;
     private GameState gameState;
     private List<Player> lstPlayerInRoom;
+    private int bettingMoney;
 
     public GamePlayer(EsObjectRO message, PluginApi api) {
         this._api = api;
@@ -87,11 +89,17 @@ public class GamePlayer {
     }
 
     /* 
-     * check user can join to room
+     * check player in room can sit
      */
-    public ErrorCode checkSit() {
+    public ErrorCode checkSit(Player playerSit, int position) {
         if (maxPlayer == getNumPlayerSit()) {
-            return ErrorCode.MaxPlayer;
+            return ErrorCode.FullSlot;
+        } else if (playerSit.getPlayerData().getMoney() < bettingMoney) {
+            return ErrorCode.NotEnoughtMoney;
+        } else if (playerSit.getState().equals(PlayerState.Sit)) {
+            return ErrorCode.PlayerSit;
+        } else if (arrPlayers[position] != null) {
+            return ErrorCode.SlotNotEmpty;
         }
         return ErrorCode.IsSuccess;
     }
@@ -99,7 +107,6 @@ public class GamePlayer {
     public EsObject[] getSlotSit() {
         EsObject[] arr = new EsObject[arrPlayers.length];
         for (int i = 0; i < arrPlayers.length; i++) {
-
             if (arrPlayers[i] != null) {
                 arr[i] = arrPlayers[i].toEsObject();
             } else {
@@ -121,6 +128,7 @@ public class GamePlayer {
 //        }
 //        return arr;
 //    }
+    
     public EsObject[] getPlayersInfo() {
         int count = 0;
         EsObject[] playersInfo = new EsObject[arrPlayers.length];
@@ -152,6 +160,18 @@ public class GamePlayer {
     }
 
     public Player getPlayer(String username) {
+        for (int i = 0; i < lstPlayerInRoom.size(); i++) {
+            Player player = lstPlayerInRoom.get(i);
+            if (player != null) {
+                if (player.getUsername().equals(username)) {
+                    return player;
+                }
+            }
+        }
+        return null;
+    }
+
+       public Player getPlayerSit(String username) {
         for (int i = 0; i < arrPlayers.length; i++) {
             Player player = arrPlayers[i];
             if (player != null) {
@@ -162,16 +182,12 @@ public class GamePlayer {
         }
         return null;
     }
-
+    
     public EsObject getEsPlayerData(Player p) {
         EsObject es = new EsObject();
         es.setString(Field.UserName.getName(), p.getUsername());
         es.setInteger(Field.Money.getName(), p.getPlayerData().getMoney());
         return es;
-    }
-
-    public void removePlayerView(Player p) {
-        lstPlayerInRoom.remove(p);
     }
 
     public List<Player> getLstPlayerInRoom() {
@@ -204,5 +220,13 @@ public class GamePlayer {
 
     public void setArrPlayers(Player[] arrPlayers) {
         this.arrPlayers = arrPlayers;
+    }
+
+    public int getBettingMoney() {
+        return bettingMoney;
+    }
+
+    public void setBettingMoney(int bettingMoney) {
+        this.bettingMoney = bettingMoney;
     }
 }
