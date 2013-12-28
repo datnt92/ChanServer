@@ -30,12 +30,10 @@ public class LobbyPlugin extends BasePlugin {
         this.publicMessageController = new PublicMessageController(model);
         this.requestController = new RequestController(model);
         this.dbController = (DatabaseController) getApi().acquireManagedObject("DatabaseControllerFactory", null);
+        this.dbController.writeLogServerStart();
         this.initRequestProcessors();
-        dbController.writeLogServerStart();
         logger.info("LobbyPlugin initialized...");
     }
-
-
 
     /**
      * resister process on server
@@ -53,7 +51,7 @@ public class LobbyPlugin extends BasePlugin {
 
     @Override
     public void request(String username, EsObjectRO requestParameters) {
-      getApi().getLogger().debug("lobby");
+       ;
     }
 
     @Override
@@ -65,8 +63,8 @@ public class LobbyPlugin extends BasePlugin {
             return ChainAction.OkAndContinue;
         }
     }
-    
-       public void rqSendAlertMessage(EsObjectRO requestParameters) {
+
+    public void rqSendAlertMessage(EsObjectRO requestParameters) {
         String strMessage = requestParameters.getString(Field.Message.getName());
         String strToUser = requestParameters.getString(Field.UserName.getName());
         EsObject es = new EsObject();
@@ -74,6 +72,4 @@ public class LobbyPlugin extends BasePlugin {
         es.setString(Field.Message.getName(), strMessage);
         getApi().sendPluginMessageToUser(strToUser, es);
     }
-
-   
 }

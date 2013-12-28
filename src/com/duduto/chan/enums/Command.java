@@ -2,6 +2,7 @@ package com.duduto.chan.enums;
 
 public enum Command {
 
+    PassCard("passCard"),
     QuitGame("quitGame"),
     GetRoomList("getRoomList"),
     GetPlayerList("getPlayerList"),
@@ -11,10 +12,13 @@ public enum Command {
     CreateRoom("createRoom"),
     JoinRoom("joinRoom"),
     Sit("sit"),
+    Up("up"),
+    Card("card"),
+    StartGame("start"),
+    DisCard("disCard"),
     LeaveRoom("leaveRoom"),
     ListPlayer("listPlayer"),
     GetBuddyList("getBuddyList");
-    
     private final String command;
 
     private Command(String command) {

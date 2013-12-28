@@ -8,6 +8,7 @@ public enum ErrorCode {
     SlotNotEmpty(101),
     NotEnoughtMoney(102),
     PlayerSit(103),
+    GameStarted(104),
     UserNameEmpty(200),
     UserNameExist(201),
     LoginFaild(202),

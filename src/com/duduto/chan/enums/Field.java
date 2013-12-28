@@ -1,8 +1,13 @@
 package com.duduto.chan.enums;
 
 public enum Field {
+    NumberSit("numbersit"),
+    Card("card"),
+    CurrentTurn("currentTurn"),
+    GameState("gameState"),
+    StartGame("start"),
     Empty("empty"),
-    slotSit("slotSit"),
+    slotSit("slot"),
     Position("position"),
     JoinRoom("joinRoom"),
     PlayerEmpty("playerEmpty"),

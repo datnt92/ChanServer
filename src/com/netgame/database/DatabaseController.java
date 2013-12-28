@@ -172,11 +172,10 @@ public class DatabaseController {
                 }
             });
         } catch (Throwable t) {
-            logger.error("writeLogServerStart error: ");
-            logger.error(t.getMessage());
+            logger.error(t.getMessage(), t);
         }
     }
-    
+
     private void writeServerStartDb(Handle handle) {
         handle.createStatement("sql/WriteLogServerStart.sql").execute();
     }

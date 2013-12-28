@@ -4,6 +4,9 @@
  */
 package com.duduto.util;
 
+import com.duduto.util.random.Shuffle;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -17,7 +20,23 @@ public class RandomUtil {
         return rnd;
     }
 
-  public static float[] genSpeedBlock(int blockSize, float avg) {
+    public static int[] getArrCard() {
+        List<Integer> list = new LinkedList<Integer>();
+        int num = 0;
+        for (int i = 0; i < 25; i++) {
+            for (int j = 0; j < 4; j++) {
+                list.add(i);
+            }
+        }
+        int arrCard[] = new int[100];
+        for (int i = 0; i < list.size(); i++) {
+            arrCard[i] = list.get(i);
+        }
+        Shuffle.shuffle(arrCard);
+        return arrCard;
+    }
+
+    public static float[] genSpeedBlock(int blockSize, float avg) {
         float[] arrRand = new float[blockSize];
 //        float avgSpeed = total / blockSize;
         float sum = 0;

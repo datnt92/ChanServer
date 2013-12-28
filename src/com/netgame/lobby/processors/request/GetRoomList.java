@@ -18,7 +18,6 @@ public class GetRoomList implements IRequestProcessor {
 	public void process(LobbyModel model, String playerName, EsObjectRO requestParameters) {
 
 		Collection<RoomValue> rooms = model.getApi().getRoomsInZone(model.getApi().getZoneId());
-		
 		List<EsObject> roomListAsEsObjects = new LinkedList<EsObject>();
 
 		for (RoomValue roomValue : rooms) {
@@ -41,7 +40,7 @@ public class GetRoomList implements IRequestProcessor {
 		message.setString(Field.Command.getName(), Command.GetRoomList.getCommand());
 		
 		if (roomListAsEsObjects.size() > 0)
-			message.setEsObjectArray(Field.RoomList.getName(),	roomListAsEsObjects.toArray(new EsObject[roomListAsEsObjects.size()]));
+			message.setEsObjectArray(Field.RoomList.getName(),roomListAsEsObjects.toArray(new EsObject[roomListAsEsObjects.size()]));
 
 		model.getApi().sendPluginMessageToUser(playerName, message);
 	}

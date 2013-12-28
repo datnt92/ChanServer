@@ -17,9 +17,11 @@ public class Player {
     private boolean masterRoom = false;
     private PlayerBean playerData;
     private PlayerState state;
+    private int myCard[];
     
     public Player(PlayerBean player) {
         this.playerData = player;
+        state = PlayerState.View;
     }
 
     public String getUsername() {
@@ -58,6 +60,15 @@ public class Player {
     public void setState(PlayerState state) {
         this.state = state;
     }
+
+    public int[] getMyCard() {
+        return myCard;
+    }
+
+    public void setMyCard(int[] myCard) {
+        this.myCard = myCard;
+    }
+    
     
     
 }

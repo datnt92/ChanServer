@@ -10,6 +10,8 @@ import com.duduto.chan.enums.ErrorCode;
 import com.duduto.chan.enums.Field;
 import com.duduto.chan.enums.GameState;
 import com.duduto.chan.enums.PlayerState;
+import com.duduto.util.MessagingHelper;
+import com.duduto.util.RandomUtil;
 import com.electrotank.electroserver5.extensions.api.PluginApi;
 import com.electrotank.electroserver5.extensions.api.value.EsObject;
 import com.electrotank.electroserver5.extensions.api.value.EsObjectRO;
@@ -30,6 +32,7 @@ public class GamePlayer {
     private GameState gameState;
     private List<Player> lstPlayerInRoom;
     private int bettingMoney;
+    private int card[];
 
     public GamePlayer(EsObjectRO message, PluginApi api) {
         this._api = api;
@@ -37,6 +40,7 @@ public class GamePlayer {
         this.maxPlayer = Global.MAX_USER_IN_ROOM;
         lstPlayerInRoom = new ArrayList<Player>();
         this.arrPlayers = new Player[maxPlayer];
+        card = RandomUtil.getArrCard();
         this.gameState = GameState.WaitingNewGame;
     }
 
@@ -91,7 +95,7 @@ public class GamePlayer {
     /* 
      * check player in room can sit
      */
-    public ErrorCode checkSit(Player playerSit, int position) {
+    public ErrorCode checkSit(Player playerSit, int position, GameState gameState) {
         if (maxPlayer == getNumPlayerSit()) {
             return ErrorCode.FullSlot;
         } else if (playerSit.getPlayerData().getMoney() < bettingMoney) {
@@ -100,6 +104,8 @@ public class GamePlayer {
             return ErrorCode.PlayerSit;
         } else if (arrPlayers[position] != null) {
             return ErrorCode.SlotNotEmpty;
+        } else if (gameState == GameState.Started) {
+            return ErrorCode.GameStarted;
         }
         return ErrorCode.IsSuccess;
     }
@@ -128,7 +134,6 @@ public class GamePlayer {
 //        }
 //        return arr;
 //    }
-    
     public EsObject[] getPlayersInfo() {
         int count = 0;
         EsObject[] playersInfo = new EsObject[arrPlayers.length];
@@ -141,22 +146,13 @@ public class GamePlayer {
         return playersInfo;
     }
 
-    public EsObject leaveRoom(String username, List<Player> lst) {
-        EsObject es = new EsObject();
-        es.setString(Field.Command.getName(), Command.LeaveRoom.getCommand());
-        es.setString(Field.UserName.getName(), username);
-        for (int i = 0; i < lst.size(); i++) {
-            Player player = lst.get(i);
-            if (player.getUsername().equals(username)) {
-                lst.remove(player);
-                if (lst.size() > 0 && player.isMasterRoom()) {
-                    lst.get(0).setMasterRoom(true);
-                    es.setString(Field.MasterRoom.getName(), lst.get(0).getUsername());
-                }
-                break;
+    public void leaveRoom(Player playerExit) {
+        lstPlayerInRoom.remove(playerExit);
+        for (int i = 0; i < arrPlayers.length; i++) {
+            if (arrPlayers[i] != null && arrPlayers[i].equals(playerExit)) {
+                arrPlayers[i] = null;
             }
         }
-        return es;
     }
 
     public Player getPlayer(String username) {
@@ -171,7 +167,7 @@ public class GamePlayer {
         return null;
     }
 
-       public Player getPlayerSit(String username) {
+    public Player getPlayerSit(String username) {
         for (int i = 0; i < arrPlayers.length; i++) {
             Player player = arrPlayers[i];
             if (player != null) {
@@ -182,7 +178,74 @@ public class GamePlayer {
         }
         return null;
     }
-    
+
+    public int setMasterRoom(Player masterRoom) {
+        for (int i = 0; i < arrPlayers.length; i++) {
+            Player player = arrPlayers[i];
+            if (masterRoom.equals(player)) {
+                for (int j = i + 1; j < arrPlayers.length; j++) {
+                    if (j == 4) {
+                        j = 0;
+                    }
+                    if (arrPlayers[j] != null) {
+                        arrPlayers[j].setMasterRoom(true);
+                        return j;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    public void playerUp(Player playerUp) {
+        for (int i = 0; i < arrPlayers.length; i++) {
+            Player player = arrPlayers[i];
+            if (player != null && playerUp.equals(player)) {
+                arrPlayers[i] = null;
+                break;
+            }
+        }
+    }
+
+    public int getFirstPlayer() {
+        for (int i = 0; i < arrPlayers.length; i++) {
+            Player player = arrPlayers[i];
+            if (player != null && player.getMyCard().length == 20) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void startGame(PluginApi api) {
+        EsObject es = new EsObject();
+        int num = 0;
+        for (int i = 0; i < arrPlayers.length; i++) {
+            Player player = arrPlayers[i];
+            if (player != null) {
+                int arrCard[];
+                if (num == 0) {
+                    arrCard = new int[20];
+                    System.arraycopy(card, num, arrCard, 0, 20);
+                    num = num + 20;
+                } else {
+                    arrCard = new int[19];
+                    System.arraycopy(card, num + 20, arrCard, 0, 19);
+                    num = num + 19;
+                }
+                player.setMyCard(arrCard);
+                es.setIntegerArray(Field.Card.getName(), player.getMyCard());
+                es.setString(Field.Command.getName(), Command.Card.getCommand());
+                MessagingHelper.sendMessageToPlayer(player.getUsername(), es, api);
+            }
+        }
+    }
+
+    public void resetGame() {
+        this.gameState = GameState.WaitingNewGame;
+        this.card = RandomUtil.getArrCard();
+    }
+
     public EsObject getEsPlayerData(Player p) {
         EsObject es = new EsObject();
         es.setString(Field.UserName.getName(), p.getUsername());
@@ -228,5 +291,13 @@ public class GamePlayer {
 
     public void setBettingMoney(int bettingMoney) {
         this.bettingMoney = bettingMoney;
+    }
+
+    public int[] getCard() {
+        return card;
+    }
+
+    public void setCard(int[] card) {
+        this.card = card;
     }
 }
