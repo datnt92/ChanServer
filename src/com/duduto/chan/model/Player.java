@@ -18,6 +18,7 @@ public class Player {
     private PlayerBean playerData;
     private PlayerState state;
     private int myCard[];
+    private int carDised[];
     
     public Player(PlayerBean player) {
         this.playerData = player;
@@ -67,6 +68,14 @@ public class Player {
 
     public void setMyCard(int[] myCard) {
         this.myCard = myCard;
+    }
+
+    public int[] getCarDised() {
+        return carDised;
+    }
+
+    public void setCarDised(int[] carDised) {
+        this.carDised = carDised;
     }
     
     

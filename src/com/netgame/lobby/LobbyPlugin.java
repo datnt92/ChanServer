@@ -8,7 +8,9 @@ import com.netgame.database.DatabaseController;
 import com.netgame.lobby.controllers.PublicMessageController;
 import com.netgame.lobby.controllers.RequestController;
 import com.duduto.chan.enums.Field;
+import com.electrotank.electroserver5.extensions.api.ScheduledCallback;
 import com.electrotank.electroserver5.extensions.api.value.EsObject;
+import com.netgame.gamemanager.AutoManager;
 import com.netgame.lobby.model.LobbyModel;
 import com.netgame.lobby.processors.request.GetPlayerList;
 import com.netgame.lobby.processors.request.GetRoomList;
@@ -32,7 +34,33 @@ public class LobbyPlugin extends BasePlugin {
         this.dbController = (DatabaseController) getApi().acquireManagedObject("DatabaseControllerFactory", null);
         this.dbController.writeLogServerStart();
         this.initRequestProcessors();
+        
+        getApi().scheduleExecution(3000, 1, new ScheduledCallback() {
+            @Override
+            public void scheduledCallback() {
+                startBot();
+            }
+        });
+
+
         logger.info("LobbyPlugin initialized...");
+    }
+
+    public void startBot() {
+        for (int i = 0; i < 25; i++) {
+            final AutoManager auto = new AutoManager();
+            auto.userName = "user" + i;
+            int time = 2000 * (i + 1);
+            getApi().scheduleExecution(time, 1,
+                    new ScheduledCallback() {
+                @Override
+                public void scheduledCallback() {
+                    getApi().getLogger().debug("Start boot: " + auto.userName);
+                    auto.initialize();
+                }
+            });
+        }
+
     }
 
     /**
@@ -51,7 +79,6 @@ public class LobbyPlugin extends BasePlugin {
 
     @Override
     public void request(String username, EsObjectRO requestParameters) {
-       ;
     }
 
     @Override

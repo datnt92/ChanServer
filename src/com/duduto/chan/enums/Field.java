@@ -1,6 +1,7 @@
 package com.duduto.chan.enums;
 
 public enum Field {
+    Noc("noc"),
     NumberSit("numbersit"),
     Card("card"),
     CurrentTurn("currentTurn"),

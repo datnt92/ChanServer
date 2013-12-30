@@ -51,6 +51,7 @@ public class ChanPlugin extends BasePlugin {
 
     @Override
     public void userDidEnter(String userName) {
+        setGameDetail();
         debug("zoneid = " + getApi().getZoneId() + " Room = " + getApi().getRoomId());
         Player p = gamePlayer.getPlayerData(userName);
         gamePlayer.getLstPlayerInRoom().add(p);
@@ -59,7 +60,7 @@ public class ChanPlugin extends BasePlugin {
         es.setString(Field.UserName.getName(), userName);
         es.setInteger(Field.GameState.getName(), gamePlayer.getGameState().getState());
         MessagingHelper.sendMessageToRoom(es, getApi());
-        getApi().getLogger().warn(userName + " join to room");
+//        getApi().getLogger().warn(userName + " join to room");
     }
 
     @Override
@@ -94,21 +95,31 @@ public class ChanPlugin extends BasePlugin {
         es.setString(Field.UserName.getName(), playerExit.getUsername());
         if (gamePlayer.getLstPlayerInRoom().size() > 0) {
             if (playerExit.isMasterRoom()) {
-                int masterRoom = gamePlayer.setMasterRoom(playerExit);
+                int masterRoom = gamePlayer.setMasterRoom();
                 es.setInteger(Field.MasterRoom.getName(), masterRoom);
             }
+            setGameDetail();
             MessagingHelper.sendMessageToRoom(es, getApi());
         } else {
             getApi().destroyRoom(getApi().getZoneId(), getApi().getRoomId());
             getApi().getLogger().warn("room " + getApi().getRoomId() + " destroyed");
         }
+        debug("number player in room" + gamePlayer.getLstPlayerInRoom().size());
     }
 
     private void rqListPlayer(String userName) {
+        debug("aaaaaaa zone = " + getApi().getZoneId() + " room= " + getApi().getRoomId());
         EsObject es = new EsObject();
         es.setString(Field.Command.getName(), Command.ListPlayer.getCommand());
         es.setEsObjectArray(Field.slotSit.getName(), gamePlayer.getSlotSit());
         MessagingHelper.sendMessageToPlayer(userName, es, getApi());
+    }
+
+    private void setGameDetail() {
+        EsObject gameDetail = getApi().getGameDetails();
+//        gameDetail.setEsObjectArray(Field.slotSit.getName(), gamePlayer.getSlotSit());
+        gameDetail.setInteger(Field.NumberSit.getName(), gamePlayer.getNumPlayerSit());
+        getApi().setGameDetails(gameDetail);
     }
 
     private void rqKickPlayer(String username, EsObjectRO request) {
@@ -137,11 +148,11 @@ public class ChanPlugin extends BasePlugin {
         if (playerUp.isMasterRoom()) {
             playerUp.setMasterRoom(false);
             if (gamePlayer.getNumPlayerSit() > 0) {
-                int master = gamePlayer.setMasterRoom(playerUp);
+                int master = gamePlayer.setMasterRoom();
                 es.setInteger(Field.MasterRoom.getName(), master);
             }
         }
-        es.setEsObjectArray(Field.slotSit.getName(), gamePlayer.getSlotSit());
+        setGameDetail();
         MessagingHelper.sendMessageToRoom(es, getApi());
     }
 
@@ -152,8 +163,10 @@ public class ChanPlugin extends BasePlugin {
             if (gamePlayer.getNumPlayerSit() >= 2) {
                 if (master.isMasterRoom()) {
                     //start game
-                    gamePlayer.setGameState(GameState.Started);
                     gamePlayer.startGame(getApi());
+                    int arrNoc[] = new int[23];
+                    System.arraycopy(gamePlayer.getCard(), 76, arrNoc, 0, 23);
+                    es.setIntegerArray(Field.Noc.getName(), arrNoc);
                     es.setInteger(Field.CurrentTurn.getName(), gamePlayer.getFirstPlayer());
                     es.setString(Field.Command.getName(), Command.PassCard.getCommand());
                     MessagingHelper.sendMessageToRoom(es, getApi());
@@ -190,6 +203,7 @@ public class ChanPlugin extends BasePlugin {
             es.setString(Field.Command.getName(), Field.Sit.getName());
             es.setString(Field.UserName.getName(), username);
             debug(username + " sit ");
+            setGameDetail();
             MessagingHelper.sendMessageToRoom(es, getApi());
         } else {
             es = new EsObject();
@@ -198,8 +212,8 @@ public class ChanPlugin extends BasePlugin {
             MessagingHelper.sendMessageToPlayer(username, es, getApi());
         }
     }
-    
-    public void rqDisCard(String username){
+
+    public void rqDisCard(String username) {
 //        Player  pl
     }
 

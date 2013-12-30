@@ -16,7 +16,6 @@ public class DatabaseControllerFactory implements ManagedObjectFactory, ManagedO
 
     @Override
     public void init(EsObjectRO parameters) {
-
         try {
             controller = new DatabaseController(loadProperties(parameters));
         } catch (RuntimeException e) {

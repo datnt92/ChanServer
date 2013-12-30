@@ -115,6 +115,7 @@ public class GamePlayer {
         for (int i = 0; i < arrPlayers.length; i++) {
             if (arrPlayers[i] != null) {
                 arr[i] = arrPlayers[i].toEsObject();
+                arr[i].setBoolean(Field.Empty.getName(), false);
             } else {
                 arr[i] = new EsObject();
                 arr[i].setBoolean(Field.Empty.getName(), true);
@@ -179,19 +180,12 @@ public class GamePlayer {
         return null;
     }
 
-    public int setMasterRoom(Player masterRoom) {
+    public int setMasterRoom() {
         for (int i = 0; i < arrPlayers.length; i++) {
             Player player = arrPlayers[i];
-            if (masterRoom.equals(player)) {
-                for (int j = i + 1; j < arrPlayers.length; j++) {
-                    if (j == 4) {
-                        j = 0;
-                    }
-                    if (arrPlayers[j] != null) {
-                        arrPlayers[j].setMasterRoom(true);
-                        return j;
-                    }
-                }
+            if (player != null) {
+                player.setMasterRoom(true);
+                return i;
             }
         }
         return -1;
@@ -218,6 +212,7 @@ public class GamePlayer {
     }
 
     public void startGame(PluginApi api) {
+        gameState = GameState.Started;
         EsObject es = new EsObject();
         int num = 0;
         for (int i = 0; i < arrPlayers.length; i++) {
