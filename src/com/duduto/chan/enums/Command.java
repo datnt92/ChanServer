@@ -13,6 +13,8 @@ public enum Command {
     JoinRoom("joinRoom"),
     Sit("sit"),
     Up("up"),
+    Steal("steal"),
+    Draw("Draw"),
     Card("card"),
     StartGame("start"),
     DisCard("disCard"),

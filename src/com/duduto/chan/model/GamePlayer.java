@@ -139,7 +139,6 @@ public class GamePlayer {
 //        }
 //        return arr;
 //    }
-    
     public EsObject[] getPlayersInfo() {
         int count = 0;
         EsObject[] playersInfo = new EsObject[arrPlayers.length];
@@ -210,12 +209,12 @@ public class GamePlayer {
         gameState = GameState.Started;
         EsObject es = new EsObject();
         int num = 0;
-        
+
         //add 23 la vao nọc
         for (int i = 76; i < card.length; i++) {
             noc.add(card[i]);
         }
-        
+
         //chia bài cho từng user
         for (int i = 0; i < arrPlayers.length; i++) {
             Player player = arrPlayers[i];
@@ -306,16 +305,26 @@ public class GamePlayer {
         return -1;
     }
 
-    public boolean isCurrentTurn(Player player){
+    public int draw(Player p) {
+        if (!noc.isEmpty()) {
+            int card = noc.get(0);
+            p.getMyCard().add(card);
+            noc.remove(card);
+            return card;
+        }
+        return -1;
+    }
+
+    public boolean isCurrentTurn(Player player) {
         for (int i = 0; i < arrPlayers.length; i++) {
             Player player1 = arrPlayers[i];
-            if (player1 !=null && player.getPosition() == currentTurn) {
+            if (player1 != null && player.getPosition() == currentTurn) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public List<Player> getLstPlayerInRoom() {
         return lstPlayerInRoom;
     }

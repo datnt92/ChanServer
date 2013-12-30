@@ -85,6 +85,8 @@ public class ChanPlugin extends BasePlugin {
             this.rqDisCard(userName, requestParameters);
         } else if (requestParameters.getString(Field.Command.getName()).equals(Command.Steal.getCommand())) {
             this.rqSteal(userName, requestParameters);
+        } else if (requestParameters.getString(Field.Command.getName()).equals(Command.Draw.getCommand())) {
+            this.rqDraw(userName);
         }
     }
 
@@ -253,8 +255,10 @@ public class ChanPlugin extends BasePlugin {
             es.setString(Field.Command.getName(), Command.Steal.getCommand());
             if (gamePlayer.isCurrentTurn(current)) {
                 Player leftPlayer = gamePlayer.getLeft();
-                if (cardId == leftPlayer.getLastDisCard()) {
+                if (current.canSteal(cardId, leftPlayer.getLastDisCard())) {
                     es.setInteger(Field.CardId.getName(), cardId);
+                    current.setSteal(false);
+                    current.setDraw(false);
                     MessagingHelper.sendMessageToRoom(es, getApi());
                 } else {
                     es.setInteger(Field.ErrorCode.getName(), ErrorCode.HasSteal.getCode());
@@ -264,6 +268,28 @@ public class ChanPlugin extends BasePlugin {
                 MessagingHelper.sendMessageToPlayer(username, es, getApi());
             }
         }
+    }
+
+    public void rqDraw(String username) {
+        Player player = gamePlayer.getPlayer(username);
+        EsObject es = new EsObject();
+        es.setString(Field.Command.getName(), Command.Draw.getCommand());
+        if (gamePlayer.isCurrentTurn(player)) {
+            if (player.isDraw()) {
+                int id = gamePlayer.draw(player);
+                MessagingHelper.sendMessageToRoom(es, getApi());
+                es.setInteger(Field.CardId.getName(), id);
+                MessagingHelper.sendMessageToPlayer(username, es, getApi());
+                player.setDraw(false);
+            } else {
+                es.setInteger(Field.ErrorCode.getName(), ErrorCode.NotCurrentTurn.getCode());
+                MessagingHelper.sendMessageToPlayer(username, es, getApi());
+            }
+        } else {
+            es.setInteger(Field.ErrorCode.getName(), ErrorCode.NotCurrentTurn.getCode());
+            MessagingHelper.sendMessageToPlayer(username, es, getApi());
+        }
+
     }
 
     private void debug(String msg) {

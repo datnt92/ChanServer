@@ -62,6 +62,21 @@ public class Player {
         return myCard.get(myCard.size() - 1);
     }
 
+
+    
+    public boolean canSteal(int card1,int card2) {
+        if (card1 == card2) {
+            return true;
+        }
+        if ((card1++)==card2) {
+            return true;
+        }
+        if ((card1+2)==card2) {
+            return true;
+        }
+        return false;
+    }
+
     public String getUsername() {
         if (playerData != null) {
             return playerData.getUsername();
