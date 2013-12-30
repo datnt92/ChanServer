@@ -17,6 +17,7 @@ import com.electrotank.electroserver5.extensions.api.value.EsObject;
 import com.electrotank.electroserver5.extensions.api.value.EsObjectRO;
 import com.netgame.database.DatabaseController;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,12 +34,15 @@ public class GamePlayer {
     private List<Player> lstPlayerInRoom;
     private int bettingMoney;
     private int card[];
+    private int currentTurn;
+    private List<Integer> noc;
 
     public GamePlayer(EsObjectRO message, PluginApi api) {
         this._api = api;
         _dbController = (DatabaseController) api.acquireManagedObject("DatabaseControllerFactory", null);
         this.maxPlayer = Global.MAX_USER_IN_ROOM;
         lstPlayerInRoom = new ArrayList<Player>();
+        noc = new ArrayList<Integer>();
         this.arrPlayers = new Player[maxPlayer];
         card = RandomUtil.getArrCard();
         this.gameState = GameState.WaitingNewGame;
@@ -135,6 +139,7 @@ public class GamePlayer {
 //        }
 //        return arr;
 //    }
+    
     public EsObject[] getPlayersInfo() {
         int count = 0;
         EsObject[] playersInfo = new EsObject[arrPlayers.length];
@@ -201,20 +206,17 @@ public class GamePlayer {
         }
     }
 
-    public int getFirstPlayer() {
-        for (int i = 0; i < arrPlayers.length; i++) {
-            Player player = arrPlayers[i];
-            if (player != null && player.getMyCard().length == 20) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public void startGame(PluginApi api) {
         gameState = GameState.Started;
         EsObject es = new EsObject();
         int num = 0;
+        
+        //add 23 la vao nọc
+        for (int i = 76; i < card.length; i++) {
+            noc.add(card[i]);
+        }
+        
+        //chia bài cho từng user
         for (int i = 0; i < arrPlayers.length; i++) {
             Player player = arrPlayers[i];
             if (player != null) {
@@ -223,13 +225,17 @@ public class GamePlayer {
                     arrCard = new int[20];
                     System.arraycopy(card, num, arrCard, 0, 20);
                     num = num + 20;
+                    currentTurn = i;
+                    player.setDisCard(true);
                 } else {
                     arrCard = new int[19];
                     System.arraycopy(card, num + 20, arrCard, 0, 19);
                     num = num + 19;
                 }
-                player.setMyCard(arrCard);
-                es.setIntegerArray(Field.Card.getName(), player.getMyCard());
+                for (int j = 0; j < arrCard.length; j++) {
+                    player.getMyCard().add(j);
+                }
+                es.setIntegerArray(Field.Card.getName(), arrCard);
                 es.setString(Field.Command.getName(), Command.Card.getCommand());
                 MessagingHelper.sendMessageToPlayer(player.getUsername(), es, api);
             }
@@ -248,6 +254,68 @@ public class GamePlayer {
         return es;
     }
 
+    public int getNextTurn() {
+        if (currentTurn == 4) {
+            currentTurn = 0;
+        }
+        for (int i = currentTurn; i > arrPlayers.length; i++) {
+            Player player = arrPlayers[i];
+            if (player != null) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public Player getRight() {
+        if (currentTurn == 4) {
+            currentTurn = 0;
+        }
+        for (int i = currentTurn; i > arrPlayers.length; i++) {
+            Player player = arrPlayers[i];
+            if (player != null) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    public Player getLeft() {
+        if (currentTurn == 0) {
+            currentTurn = 4;
+        }
+        for (int i = currentTurn; i > -1; i--) {
+            Player player = arrPlayers[i];
+            if (player != null) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    public int getPrevTurn(int turn) {
+        if (turn == 0) {
+            turn = 4;
+        }
+        for (int i = turn; i > -1; i--) {
+            Player player = arrPlayers[i];
+            if (player != null) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public boolean isCurrentTurn(Player player){
+        for (int i = 0; i < arrPlayers.length; i++) {
+            Player player1 = arrPlayers[i];
+            if (player1 !=null && player.getPosition() == currentTurn) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public List<Player> getLstPlayerInRoom() {
         return lstPlayerInRoom;
     }
@@ -294,5 +362,21 @@ public class GamePlayer {
 
     public void setCard(int[] card) {
         this.card = card;
+    }
+
+    public int getCurrentTurn() {
+        return currentTurn;
+    }
+
+    public void setCurrentTurn(int turn) {
+        this.currentTurn = turn;
+    }
+
+    public List<Integer> getNoc() {
+        return noc;
+    }
+
+    public void setNoc(List<Integer> noc) {
+        this.noc = noc;
     }
 }

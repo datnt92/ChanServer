@@ -82,7 +82,9 @@ public class ChanPlugin extends BasePlugin {
         } else if (requestParameters.getString(Field.Command.getName()).equals(Command.StartGame.getCommand())) {
             this.rqStartGame(userName);
         } else if (requestParameters.getString(Field.Command.getName()).equals(Command.DisCard.getCommand())) {
-            this.rqDisCard(userName);
+            this.rqDisCard(userName, requestParameters);
+        } else if (requestParameters.getString(Field.Command.getName()).equals(Command.Steal.getCommand())) {
+            this.rqSteal(userName, requestParameters);
         }
     }
 
@@ -117,7 +119,7 @@ public class ChanPlugin extends BasePlugin {
 
     private void setGameDetail() {
         EsObject gameDetail = getApi().getGameDetails();
-//        gameDetail.setEsObjectArray(Field.slotSit.getName(), gamePlayer.getSlotSit());
+        gameDetail.setEsObjectArray(Field.slotSit.getName(), gamePlayer.getSlotSit());
         gameDetail.setInteger(Field.NumberSit.getName(), gamePlayer.getNumPlayerSit());
         getApi().setGameDetails(gameDetail);
     }
@@ -164,10 +166,8 @@ public class ChanPlugin extends BasePlugin {
                 if (master.isMasterRoom()) {
                     //start game
                     gamePlayer.startGame(getApi());
-                    int arrNoc[] = new int[23];
-                    System.arraycopy(gamePlayer.getCard(), 76, arrNoc, 0, 23);
-                    es.setIntegerArray(Field.Noc.getName(), arrNoc);
-                    es.setInteger(Field.CurrentTurn.getName(), gamePlayer.getFirstPlayer());
+                    es.setInteger(Field.Noc.getName(), gamePlayer.getNoc().size());
+                    es.setInteger(Field.CurrentTurn.getName(), gamePlayer.getCurrentTurn());
                     es.setString(Field.Command.getName(), Command.PassCard.getCommand());
                     MessagingHelper.sendMessageToRoom(es, getApi());
                 } else {
@@ -198,11 +198,11 @@ public class ChanPlugin extends BasePlugin {
                 player.setMasterRoom(true);
             }
             player.setState(PlayerState.Sit);
+            player.setPosition(position);
             es = gamePlayer.getEsPlayerData(player);
             es.setInteger(Field.Position.getName(), position);
             es.setString(Field.Command.getName(), Field.Sit.getName());
             es.setString(Field.UserName.getName(), username);
-            debug(username + " sit ");
             setGameDetail();
             MessagingHelper.sendMessageToRoom(es, getApi());
         } else {
@@ -213,8 +213,57 @@ public class ChanPlugin extends BasePlugin {
         }
     }
 
-    public void rqDisCard(String username) {
-//        Player  pl
+    public void rqDisCard(String username, EsObjectRO request) {
+        if (!request.variableExists(Field.CardId.getName())) {
+            debug("not parameter card id");
+        } else {
+            EsObject es = new EsObject();
+            es.setString(Field.Command.getName(), Command.DisCard.getCommand());
+            int cardId = request.getInteger(Field.CardId.getName());
+            Player player = gamePlayer.getPlayer(username);
+            if (gamePlayer.isCurrentTurn(player)) {
+                if (player.hasCard(cardId)) {
+                    player.disCard(cardId);
+                    es.setInteger(Field.CardId.getName(), cardId);
+                    gamePlayer.setCurrentTurn(gamePlayer.getNextTurn());
+                    Player nextTurn = gamePlayer.getRight();
+                    nextTurn.setSteal(true);
+                    nextTurn.setDraw(true);
+                    nextTurn.setDisCard(true);
+                    es.setInteger(Field.CurrentTurn.getName(), gamePlayer.getCurrentTurn());
+                    MessagingHelper.sendMessageToRoom(es, getApi());
+                } else {
+                    es.setInteger(Field.ErrorCode.getName(), ErrorCode.HasCard.getCode());
+                    MessagingHelper.sendMessageToPlayer(username, es, getApi());
+                }
+            } else {
+                es.setInteger(Field.ErrorCode.getName(), ErrorCode.NotCurrentTurn.getCode());
+                MessagingHelper.sendMessageToPlayer(username, es, getApi());
+            }
+        }
+    }
+
+    public void rqSteal(String username, EsObjectRO request) {
+        if (!request.variableExists(Field.CardId.getName())) {
+            debug("not parameter card id");
+        } else {
+            Player current = gamePlayer.getPlayer(username);
+            int cardId = request.getInteger(Field.CardId.getName());
+            EsObject es = new EsObject();
+            es.setString(Field.Command.getName(), Command.Steal.getCommand());
+            if (gamePlayer.isCurrentTurn(current)) {
+                Player leftPlayer = gamePlayer.getLeft();
+                if (cardId == leftPlayer.getLastDisCard()) {
+                    es.setInteger(Field.CardId.getName(), cardId);
+                    MessagingHelper.sendMessageToRoom(es, getApi());
+                } else {
+                    es.setInteger(Field.ErrorCode.getName(), ErrorCode.HasSteal.getCode());
+                }
+            } else {
+                es.setInteger(Field.ErrorCode.getName(), ErrorCode.NotCurrentTurn.getCode());
+                MessagingHelper.sendMessageToPlayer(username, es, getApi());
+            }
+        }
     }
 
     private void debug(String msg) {

@@ -1,9 +1,12 @@
 package com.duduto.chan.enums;
 
 public enum Field {
+    isSteal("isSteal"),
+    isTurn("isTurn"),
     Noc("noc"),
     NumberSit("numbersit"),
     Card("card"),
+    CardId("cardId"),
     CurrentTurn("currentTurn"),
     GameState("gameState"),
     StartGame("start"),
@@ -40,6 +43,7 @@ public enum Field {
     Status("status"),
     PlayerState("state"),
     HasPass("hasPass"),
+    HasCard("hasCard"),
     RoomList("roomList"),
     CommonInfo("commonInfo"),
     Avatar("avatar"),
