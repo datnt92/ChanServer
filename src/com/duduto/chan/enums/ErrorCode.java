@@ -12,6 +12,8 @@ public enum ErrorCode {
     NotCurrentTurn(105),
     HasCard(106),
     HasSteal(107),
+    NotMaster(108),
+    NumberSit(109),
     UserNameEmpty(200),
     UserNameExist(201),
     LoginFaild(202),

@@ -18,9 +18,12 @@ public class PlayerBean {
     private String password;
     private String email;
     private String timeRegister;
-    private int fakeMoney;
-    private int money;
+    private int coin;
+    private int gold;
     private int status;
+    private int level;
+    private String appellation;
+    private boolean isAuto = false;
 
     public PlayerBean() {
     }
@@ -73,28 +76,55 @@ public class PlayerBean {
         this.status = status;
     }
 
-    public int getFakeMoney() {
-        return fakeMoney;
+    public int getCoin() {
+        return coin;
     }
 
-    public void setFakeMoney(int fakeMoney) {
-        this.fakeMoney = fakeMoney;
+    public void setCoin(int coin) {
+        this.coin = coin;
     }
 
-    public int getMoney() {
-        return money;
+    public int getGold() {
+        return gold;
     }
 
-    public void setMoney(int money) {
-        this.money = money;
+    public void setGold(int gold) {
+        this.gold = gold;
+    }
+
+    public boolean isIsAuto() {
+        return isAuto;
+    }
+
+    public void setIsAuto(boolean isAuto) {
+        this.isAuto = isAuto;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public String getAppellation() {
+        return appellation;
+    }
+
+    public void setAppellation(String appellation) {
+        this.appellation = appellation;
     }
 
     public EsObject toEsObject() {
         EsObject es = new EsObject();
+        es.setBoolean("isAuto", isAuto);
         es.setString(Field.UserName.getName(), username);
         es.setString(Field.Email.getName(), email);
-        es.setInteger(Field.Money.getName(), money);
-        es.setInteger(Field.FakeMoney.getName(), fakeMoney);
+        es.setInteger(Field.Gold.getName(), gold);
+        es.setInteger(Field.Level.getName(), level);
+        es.setString(Field.Appellation.getName(), appellation);
+        es.setInteger(Field.Coin.getName(), coin);
         return es;
     }
 }

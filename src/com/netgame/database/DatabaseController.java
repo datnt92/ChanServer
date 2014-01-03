@@ -70,7 +70,6 @@ public class DatabaseController {
                 logger.warn("username and password doesn't exist");
                 return null;
             } else {
-                
                 PlayerBean player = new PlayerBean();
                 player.setUsername(username);
                 player.setPassword(pass);
@@ -78,6 +77,8 @@ public class DatabaseController {
                 player.setTimeRegister(map.get("time_insert").toString());
                 player.setEmail(map.get("email").toString());
                 player.setpId(Integer.valueOf(map.get("player_id").toString()));
+                player.setAppellation(map.get("cs_appellation").toString());
+                player.setLevel(Integer.parseInt(map.get("cs_level").toString()));
                 return player;
             }
         } catch (Exception e) {
@@ -110,15 +111,16 @@ public class DatabaseController {
                 logger.warn("username and password doesn't exist");
                 return null;
             } else {
-                
                 PlayerBean player = new PlayerBean();
                 player.setUsername(username);
-                player.setMoney(Integer.parseInt(map.get("money").toString()));
-                player.setFakeMoney(Integer.parseInt(map.get("fake_money").toString()));
+                player.setGold(Integer.parseInt(map.get("money").toString()));
+                player.setCoin(Integer.parseInt(map.get("fake_money").toString()));
                 player.setPassword(map.get("password").toString());
                 player.setStatus(Integer.valueOf(map.get("status").toString()));
                 player.setTimeRegister(map.get("time_insert").toString());
                 player.setEmail(map.get("email").toString());
+                    player.setAppellation(map.get("cs_appellation").toString());
+                player.setLevel(Integer.parseInt(map.get("cs_level").toString()));
                 player.setpId(Integer.valueOf(map.get("player_id").toString()));
                 return player;
             }

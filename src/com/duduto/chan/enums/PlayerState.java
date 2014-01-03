@@ -2,16 +2,17 @@ package com.duduto.chan.enums;
 
 public enum PlayerState {
 
-    View(101),
-    Sit(102),
-    PlayGame(0);
-    private final int state;
+    View("view"),
+    Watting("waitting"),
+    Playing("playing");
+    
+    private final String state;
 
-    private PlayerState(int state) {
+    private PlayerState(String state) {
         this.state = state;
     }
 
-    public int getState() {
+    public String getState() {
         return state;
     }
 }

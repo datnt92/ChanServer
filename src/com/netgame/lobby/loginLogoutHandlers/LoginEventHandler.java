@@ -36,6 +36,10 @@ public class LoginEventHandler extends BaseLoginEventHandler {
 //            password = EnUtil.getMD5String(strPassword);
 //            PlayerBean playerBean = dbController.loginDB(username, password);
             PlayerBean playerBean = dbController.getPlayerData(username);
+            
+            if (!context.getUserVariables().isEmpty()) {
+                playerBean.setIsAuto(true);
+            }
             //login faild
             if (playerBean == null) {
                 EsObject es = MessagingHelper.buildErrorMessage(username, ErrorCode.LoginFaild, Message.LoginFaild.getMessage());

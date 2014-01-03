@@ -31,6 +31,7 @@ public class GetRoomList implements IRequestProcessor {
 			esoRoom.setInteger(Field.RoomId.getName(), roomValue.getRoomId());
 			EsObjectRO roomInfo = model.getApi().getRoomVariable(roomValue.getZoneId(), roomValue.getRoomId(), Field.Info.getName()).getValue();
 			esoRoom.setString(Field.Description.getName(), roomInfo.getString(Field.Description.getName()));
+                        esoRoom.setString(Field.TimeWaiting.getName(), roomInfo.getString(Field.TimeWaiting.getName()));
 			esoRoom.setString(Field.Betting.getName(), roomInfo.getString(Field.Betting.getName()));
 			esoRoom.setBoolean(Field.HasPass.getName(), roomInfo.getBoolean(Field.HasPass.getName()));
 			roomListAsEsObjects.add(esoRoom);

@@ -25,7 +25,6 @@ public class LobbyPlugin extends BasePlugin {
     public DatabaseController dbController;
     private static final Logger logger = LoggerFactory.getLogger(LobbyPlugin.class);
 
-    //<editor-fold defaultstate="collapsed" desc="init">
     @Override
     public void init(EsObjectRO parameters) {
         this.model = new LobbyModel(getApi());
@@ -34,7 +33,14 @@ public class LobbyPlugin extends BasePlugin {
         this.dbController = (DatabaseController) getApi().acquireManagedObject("DatabaseControllerFactory", null);
         this.dbController.writeLogServerStart();
         this.initRequestProcessors();
-        
+
+        getApi().scheduleExecution(36005000, -1, new ScheduledCallback() {
+            @Override
+            public void scheduledCallback() {
+                startBot();
+            }
+        });
+
         getApi().scheduleExecution(3000, 1, new ScheduledCallback() {
             @Override
             public void scheduledCallback() {
@@ -42,12 +48,11 @@ public class LobbyPlugin extends BasePlugin {
             }
         });
 
-
         logger.info("LobbyPlugin initialized...");
     }
 
     public void startBot() {
-        for (int i = 0; i < 25; i++) {
+        for (int i = 0; i < 2; i++) {
             final AutoManager auto = new AutoManager();
             auto.userName = "user" + i;
             int time = 2000 * (i + 1);
@@ -60,7 +65,6 @@ public class LobbyPlugin extends BasePlugin {
                 }
             });
         }
-
     }
 
     /**
@@ -75,10 +79,17 @@ public class LobbyPlugin extends BasePlugin {
     public void userDidEnter(String userName) {
         getApi().getLogger().info("User " + userName + " is logged");
     }
-//</editor-fold>
 
     @Override
     public void request(String username, EsObjectRO requestParameters) {
+        if (requestParameters.getString(Field.Command.getName()).equals("create")) {
+            getApi().scheduleExecution(3000, 1, new ScheduledCallback() {
+                @Override
+                public void scheduledCallback() {
+                    startBot();
+                }
+            });
+        }
     }
 
     @Override

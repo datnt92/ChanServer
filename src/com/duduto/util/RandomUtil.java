@@ -5,6 +5,8 @@
 package com.duduto.util;
 
 import com.duduto.util.random.Shuffle;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -28,11 +30,17 @@ public class RandomUtil {
                 list.add(i);
             }
         }
+        Collections.shuffle(list);
         int arrCard[] = new int[100];
         for (int i = 0; i < list.size(); i++) {
             arrCard[i] = list.get(i);
         }
-        Shuffle.shuffle(arrCard);
+        for (int it = 0; it < arrCard.length; it++) {
+            int el = arrCard[it];
+            int rn = (int) Math.floor(Math.random() * arrCard.length);
+            arrCard[it] = arrCard[rn];
+            arrCard[rn] = el;
+        }
         return arrCard;
     }
 

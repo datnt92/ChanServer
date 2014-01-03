@@ -1,14 +1,11 @@
 package com.netgame.gamemanager;
 
 import com.duduto.chan.enums.Field;
-import com.duduto.util.Log;
 import com.electrotank.electroserver5.client.ElectroServer;
 import com.electrotank.electroserver5.client.api.EsConnectionClosedEvent;
 import com.electrotank.electroserver5.client.api.EsConnectionResponse;
-import com.electrotank.electroserver5.client.api.EsCreateRoomRequest;
 import com.electrotank.electroserver5.client.api.EsFindGamesRequest;
 import com.electrotank.electroserver5.client.api.EsFindGamesResponse;
-import com.electrotank.electroserver5.client.api.EsGetUserCountRequest;
 import com.electrotank.electroserver5.client.api.EsJoinGameRequest;
 import com.electrotank.electroserver5.client.api.EsJoinRoomEvent;
 import com.electrotank.electroserver5.client.api.EsLoginRequest;
@@ -23,7 +20,6 @@ import com.electrotank.electroserver5.client.connection.AvailableConnection;
 import com.electrotank.electroserver5.client.connection.TransportType;
 import com.electrotank.electroserver5.client.extensions.api.value.EsObject;
 import com.electrotank.electroserver5.client.server.Server;
-import com.netgame.database.DatabaseController;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -39,8 +35,8 @@ public class AutoManager {
     public String zoneName = "ChanZone";
     public String pluginName = "ChanPlugin";
     public String userName;
-    private int _zoneID;
-    private int _roomID;
+    public int _zoneID;
+    public int _roomID;
     //public int outTime;
 //	Timer timer;
     public int betting = 100;
@@ -123,7 +119,6 @@ public class AutoManager {
     public void onFindGamesResponse(EsFindGamesResponse e) {
         EsServerGame[] esg = e.getGames();
         if (esg.length == 0) {
-
             createRoom();
         } else {
             for (int i = 0; i < esg.length; i++) {
@@ -131,7 +126,6 @@ public class AutoManager {
                     int numberSit = esg[i].getGameDetails().getInteger("numbersit");
                     if (numberSit >= 2) {
                     } else {
-                        logger.error("dong 135");
                         EsJoinGameRequest esq = new EsJoinGameRequest();
                         esq.setGameId(esg[i].getId());
                         es.getEngine().send(esq);
@@ -164,8 +158,21 @@ public class AutoManager {
         if (e.isSuccessful()) {
             EsLoginRequest lr = new EsLoginRequest();
             lr.setUserName(userName);
+            EsObject userInfo = new EsObject();
+            userInfo.setBoolean("isAuto", true);
+            Map<String, EsObject> map = new HashMap<String, EsObject>();
+            map.put("userInfo", userInfo);
+            lr.setUserVariables(map);
             es.getEngine().send(lr);
         }
+    }
+
+    public void disCard(int cardId) {
+        logger.error("test auto discard");
+        EsObject esTest = new EsObject();
+        esTest.setString("command", "disCard");
+        esTest.setInteger("cardId", cardId);
+        this.sendRequestMessage(esTest);
     }
 
     public void findGame() {
